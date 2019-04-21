@@ -1,38 +1,41 @@
 (ns commonmark-clj.core)
 (require '[clojure.string :refer [split-lines starts-with? blank?]])
+(require '[commonmark_clj.node :as node])
+(require '[clojure.zip :as zip])
 
-(defn create-node [type]
-  {:type type
-   :parent nil
-   :children []
-   :string-value nil})
-
-(defn append-child [parent child]
-  (assoc parent :children (conj (:children parent) child)))
-
-(defn is-paragraph [line]
+(defn is-paragraph [_line]
   true)
 
+(defn last-node [document]
+  (last
+    (take-while (complement zip/end?)
+      (iterate zip/next document))))
+
+(defn append-paragraph [document line]
+  (if (= (:type (zip/node (last-node document))) :p)
+    (let [prev-p (last-node document)
+          node (zip/node (last-node document))]
+      (zip/replace prev-p (assoc node :string-value (str (:string-value node) "\n" line))))
+    (zip/append-child document {:type :p :string-value line})))
+
 (defn parse-line [document line]
-  (println "handle line")
   (cond
-    (is-paragraph line) (append-child document {:type :paragraph :parent document :string-value line})
+    (is-paragraph line) (append-paragraph document line)
     :else document))
 
 (defn empty-lines? [line]
   (not (blank? line)))
 
 (defn parse
-  "Parses the contents into AST"
+  "Parses the contents into AST."
   [contents]
-  (let [document (create-node :document)
+  (let [document-zipper (node/node-zip (node/create-node :document))
         lines (->> contents (split-lines) (filter empty-lines?))]
     (println "lines" lines)
-    (reduce parse-line document lines)))
-
+    (zip/root (reduce parse-line document-zipper lines))))
 
 (defn -main []
-  (println "AST: " (parse "hello")))
+  (println "AST: " (parse "hello\nworld!")))
 
 
 
