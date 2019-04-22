@@ -6,7 +6,6 @@
    :children []
    :string-value nil})
 
-
 (defn node-zip [root]
   (zip/zipper
     (fn [_] true)

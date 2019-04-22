@@ -11,15 +11,25 @@
     (take-while (complement zip/end?)
       (iterate zip/next document))))
 
+(defn root-loc [document]
+  (node/node-zip (zip/root document)))
+
 (defn append-paragraph [document line]
   (if (= (:type (zip/node (last-node document))) :p)
     (let [prev-p (last-node document)
           node (zip/node (last-node document))]
       (zip/replace prev-p (assoc node :string-value (str (:string-value node) "\n" line))))
-    (zip/append-child document {:type :p :string-value line})))
+    (zip/append-child (root-loc document) {:type :p :string-value line})))
+
+(defn is-h1 [line]
+  (starts-with? line "# "))
+
+(defn append-header-h1 [document line]
+  (zip/append-child (root-loc document) {:type :h1 :string-value line}))
 
 (defn parse-line [document line]
   (cond
+    (is-h1 line) (append-header-h1 document line)
     (is-paragraph line) (append-paragraph document line)
     :else document))
 
@@ -35,7 +45,7 @@
     (zip/root (reduce parse-line document-zipper lines))))
 
 (defn -main []
-  (println "AST: " (parse "hello\nworld!")))
+  (println "AST: " (parse "hello\nworld!\n# HEADER!\n"))
 
 
 
