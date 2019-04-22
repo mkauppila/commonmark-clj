@@ -44,8 +44,20 @@
     (println "lines" lines)
     (zip/root (reduce parse-line document-zipper lines))))
 
+(defn render-element [acc el]
+  (cond
+    (= (:type el) :p) (str acc "<p>" (:string-value el) "</p>")
+    (= (:type el) :h1) (str acc "<h1>" (:string-value el) "</h1>")
+    :else acc))
+
+(defn render-html [ast]
+  (let []
+    (reduce render-element "" (:children ast))))
+
+
 (defn -main []
   (println "AST: " (parse "hello\nworld!\n# HEADER!\n"))
+  (println "HTML: " (-> "hello\nworld!\n# HEADER!\n" parse render-html)))
 
 
 
