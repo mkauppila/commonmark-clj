@@ -1,4 +1,4 @@
-(ns commonmark_clj.node
+(ns commonmark-clj.node
   (:require [clojure.zip :as zip]))
 
 (defn create-node [type]
@@ -13,7 +13,6 @@
     (fn [x children]
       (assoc x :children children))
     root))
-
 
 
 

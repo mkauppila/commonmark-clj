@@ -1,7 +1,8 @@
 (ns commonmark-clj.core)
 (require '[clojure.string :refer [split-lines starts-with? blank?]])
-(require '[commonmark_clj.node :as node])
+(require '[commonmark-clj.node :as node])
 (require '[clojure.zip :as zip])
+(require '[clojure.data.json :as json])
 
 (defn is-paragraph [_line]
   true)
@@ -51,13 +52,16 @@
     :else acc))
 
 (defn render-html [ast]
-  (let []
-    (reduce render-element "" (:children ast))))
+  (reduce render-element "" (:children ast)))
 
+(defn execute-test [{markdown :markdown html :html count :example}]
+  (if (= (-> markdown parse render-html) html)
+    (println "Test number " count " passed")
+    (println "Fail! Test number " count ". '" markdown "' <-> '" html "'")))
 
 (defn -main []
-  (println "AST: " (parse "hello\nworld!\n# HEADER!\n"))
-  (println "HTML: " (-> "hello\nworld!\n# HEADER!\n" parse render-html)))
-
+  (println "Run some tests")
+  (doseq [example (-> "./spec.json" slurp (json/read-str :key-fn keyword))]
+    (execute-test example)))
 
 
