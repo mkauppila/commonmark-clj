@@ -54,5 +54,13 @@
     "start_line": 598,
     "end_line": 604,
     "section": "Thematic breaks"
+  },
+  {
+    "markdown": "_____________________________________\n",
+    "html": "<hr />\n",
+    "example": 20,
+    "start_line": 609,
+    "end_line": 613,
+    "section": "Thematic breaks"
   }
 ]

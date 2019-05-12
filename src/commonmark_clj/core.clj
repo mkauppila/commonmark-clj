@@ -17,7 +17,7 @@
 
 (def not-nil? (complement nil?))
 
-(defn matcher-pattern [line pattern]
+(defn matches-pattern [line pattern]
   (not-nil? (re-matches pattern line)))
 
 (defn append-paragraph [document line]
@@ -34,13 +34,14 @@
   (zip/append-child (root-loc document) {:type :h1 :string-value line}))
 
 (defn is-semantic-break [line]
-  (matcher-pattern line #" {0,3}(\*\*\*|---|___)"))
+  ; a bug: ***---------- (is not valid!)
+  (matches-pattern line #" {0,3}(\*\*\*|---|___)(\*|-|_)*"))
 
 (defn append-semantic-break [document line]
   (zip/append-child (root-loc document) {:type :hr :string-value line}))
 
 (defn is-code-block [line]
-  (matcher-pattern line #" {4}.*"))
+  (matches-pattern line #" {4}.*"))
 
 (defn append-code-block [document line]
   (if (= (:type (zip/node (last-node document))) :p)
