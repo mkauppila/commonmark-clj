@@ -15,6 +15,11 @@
 (defn root-loc [document]
   (node/node-zip (zip/root document)))
 
+(def not-nil? (complement nil?))
+
+(defn matcher-pattern [line pattern]
+  (not-nil? (re-matches pattern line)))
+
 (defn append-paragraph [document line]
   (if (= (:type (zip/node (last-node document))) :p)
     (let [prev-p (last-node document)
@@ -28,9 +33,17 @@
 (defn append-header-h1 [document line]
   (zip/append-child (root-loc document) {:type :h1 :string-value line}))
 
+(defn is-semantic-break [line]
+  (matcher-pattern line #" {0,3}(\*\*\*|---|___)"))
+
+(defn append-semantic-break [document line]
+  (zip/append-child (root-loc document) {:type :hr :string-value line}))
+
 (defn parse-line [document line]
   (cond
     (is-h1 line) (append-header-h1 document line)
+    (is-semantic-break line) (append-semantic-break document line)
+    ; new stuff here
     (is-paragraph line) (append-paragraph document line)
     :else document))
 
@@ -42,13 +55,13 @@
   [contents]
   (let [document-zipper (node/node-zip (node/create-node :document))
         lines (->> contents (split-lines) (filter empty-lines?))]
-    (println "lines" lines)
     (zip/root (reduce parse-line document-zipper lines))))
 
 (defn render-element [acc el]
   (cond
-    (= (:type el) :p) (str acc "<p>" (:string-value el) "</p>")
+    (= (:type el) :p) (str acc "<p>" (:string-value el) "</p>\n")
     (= (:type el) :h1) (str acc "<h1>" (:string-value el) "</h1>")
+    (= (:type el) :hr) (str acc "<hr />\n")
     :else acc))
 
 (defn render-html [ast]
@@ -57,7 +70,14 @@
 (defn execute-test [{markdown :markdown html :html count :example}]
   (if (= (-> markdown parse render-html) html)
     (println "Test number " count " passed")
-    (println "Fail! Test number " count ". '" markdown "' <-> '" html "'")))
+    (println "Fail! Test number " count ".\n"
+             "Original commonmark:\n "
+             markdown
+             "Rendered html:\n"
+             "'" (-> markdown parse render-html) "'"
+             "\nOriginal html:\n"
+             "'" html "'"
+             "\n")))
 
 (defn -main []
   (println "Run some tests")
