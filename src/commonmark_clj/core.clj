@@ -1,5 +1,5 @@
 (ns commonmark-clj.core)
-(require '[clojure.string :refer [split-lines starts-with? blank?]])
+(require '[clojure.string :refer [split-lines starts-with? blank? trim]])
 (require '[commonmark-clj.node :as node])
 (require '[clojure.zip :as zip])
 (require '[clojure.data.json :as json])
@@ -39,10 +39,22 @@
 (defn append-semantic-break [document line]
   (zip/append-child (root-loc document) {:type :hr :string-value line}))
 
+(defn is-code-block [line]
+  (matcher-pattern line #" {4}.*"))
+
+(defn append-code-block [document line]
+  (if (= (:type (zip/node (last-node document))) :p)
+    (let [prev-p (last-node document)
+          node (zip/node (last-node document))]
+      (zip/replace prev-p (-> node
+                              (assoc :string-value (str (:string-value node) "\n" (trim line))))))
+    (zip/append-child (root-loc document) {:type :code :string-value (trim line)})))
+
 (defn parse-line [document line]
   (cond
     (is-h1 line) (append-header-h1 document line)
     (is-semantic-break line) (append-semantic-break document line)
+    (is-code-block line) (append-code-block document line)
     ; new stuff here
     (is-paragraph line) (append-paragraph document line)
     :else document))
@@ -62,6 +74,7 @@
     (= (:type el) :p) (str acc "<p>" (:string-value el) "</p>\n")
     (= (:type el) :h1) (str acc "<h1>" (:string-value el) "</h1>")
     (= (:type el) :hr) (str acc "<hr />\n")
+    (= (:type el) :code) (str acc "<pre><code>" (:string-value el) "\n</code></pre>\n")
     :else acc))
 
 (defn render-html [ast]
