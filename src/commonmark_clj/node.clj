@@ -4,7 +4,8 @@
 (defn create-node [type]
   {:type type
    :children []
-   :string-value nil})
+   :string-value nil
+   :closed? false})
 
 (defn node-zip [root]
   (zip/zipper

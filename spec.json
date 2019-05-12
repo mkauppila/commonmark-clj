@@ -94,5 +94,13 @@
     "start_line": 641,
     "end_line": 645,
     "section": "Thematic breaks"
+  },
+  {
+    "markdown": "_ _ _ _ a\n\na------\n\n---a---\n",
+    "html": "<p>_ _ _ _ a</p>\n<p>a------</p>\n<p>---a---</p>\n",
+    "example": 25,
+    "start_line": 650,
+    "end_line": 660,
+    "section": "Thematic breaks"
   }
 ]

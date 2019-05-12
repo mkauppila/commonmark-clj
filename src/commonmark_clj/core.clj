@@ -7,7 +7,7 @@
 (defn is-paragraph [_line]
   true)
 
-(defn last-node [document]
+(defn prev-node [document]
   (last
     (take-while (complement zip/end?)
       (iterate zip/next document))))
@@ -21,11 +21,15 @@
   (not-nil? (re-matches pattern line)))
 
 (defn append-paragraph [document line]
-  (if (= (:type (zip/node (last-node document))) :p)
-    (let [prev-p (last-node document)
-          node (zip/node (last-node document))]
-      (zip/replace prev-p (assoc node :string-value (str (:string-value node) "\n" line))))
-    (zip/append-child (root-loc document) {:type :p :string-value line})))
+  (let [pn (zip/node (prev-node document))]
+    (if (and
+          (not-nil? pn)
+          (= (:type pn) :p)
+          (= (:closed? pn) false))
+      (let [prev-p (prev-node document)]
+       (zip/replace prev-p
+                    (assoc pn :string-value (str (:string-value pn) "\n" line))))
+      (zip/append-child (root-loc document) {:type :p :string-value line :closed? false}))))
 
 (defn is-h1 [line]
   (starts-with? line "# "))
@@ -43,12 +47,19 @@
   (matches-pattern line #" {4}.*"))
 
 (defn append-code-block [document line]
-  (if (= (:type (zip/node (last-node document))) :p)
-    (let [prev-p (last-node document)
-          node (zip/node (last-node document))]
+  (if (= (:type (zip/node (prev-node document))) :p)
+    (let [prev-p (prev-node document)
+          node (zip/node (prev-node document))]
       (zip/replace prev-p (-> node
                               (assoc :string-value (str (:string-value node) "\n" (trim line))))))
     (zip/append-child (root-loc document) {:type :code :string-value (trim line)})))
+
+(defn is-empty-line [line]
+  (= line ""))
+
+(defn close-previous-node [document line]
+  (let [node (zip/node (prev-node document))]
+    (zip/replace (prev-node document) (-> node (assoc :closed? true)))))
 
 (defn parse-line [document line]
   (cond
@@ -56,17 +67,15 @@
     (is-semantic-break line) (append-semantic-break document line)
     (is-code-block line) (append-code-block document line)
     ; new stuff here
+    (is-empty-line line) (close-previous-node document line)
     (is-paragraph line) (append-paragraph document line)
     :else document))
-
-(defn empty-lines? [line]
-  (not (blank? line)))
 
 (defn parse
   "Parses the contents into AST."
   [contents]
   (let [document-zipper (node/node-zip (node/create-node :document))
-        lines (->> contents (split-lines) (filter empty-lines?))]
+        lines (->> contents (split-lines))]
     (zip/root (reduce parse-line document-zipper lines))))
 
 (defn render-element [acc el]
