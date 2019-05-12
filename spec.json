@@ -1,0 +1,58 @@
+[
+  {
+    "markdown": "***\n---\n___\n",
+    "html": "<hr />\n<hr />\n<hr />\n",
+    "example": 13,
+    "start_line": 535,
+    "end_line": 543,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "+++\n",
+    "html": "<p>+++</p>\n",
+    "example": 14,
+    "start_line": 548,
+    "end_line": 552,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "===\n",
+    "html": "<p>===</p>\n",
+    "example": 15,
+    "start_line": 555,
+    "end_line": 559,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "--\n**\n__\n",
+    "html": "<p>--\n**\n__</p>\n",
+    "example": 16,
+    "start_line": 564,
+    "end_line": 572,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": " ***\n  ***\n   ***\n",
+    "html": "<hr />\n<hr />\n<hr />\n",
+    "example": 17,
+    "start_line": 577,
+    "end_line": 585,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "    ***\n",
+    "html": "<pre><code>***\n</code></pre>\n",
+    "example": 18,
+    "start_line": 590,
+    "end_line": 595,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "Foo\n    ***\n",
+    "html": "<p>Foo\n***</p>\n",
+    "example": 19,
+    "start_line": 598,
+    "end_line": 604,
+    "section": "Thematic breaks"
+  }
+]
