@@ -34,7 +34,7 @@
   (zip/append-child (root-loc document) {:type :h1 :string-value line}))
 
 (defn is-semantic-break [line]
-  (matches-pattern line #" {0,3}(((-|\*|\_) ?){3,})+"))
+  (matches-pattern line #" {0,3}(((-|\*|\_) *){3,})"))
 
 (defn append-semantic-break [document line]
   (zip/append-child (root-loc document) {:type :hr :string-value line}))

@@ -70,5 +70,29 @@
     "start_line": 618,
     "end_line": 622,
     "section": "Thematic breaks"
+  },
+  {
+    "markdown": " **  * ** * ** * **\n",
+    "html": "<hr />\n",
+    "example": 22,
+    "start_line": 625,
+    "end_line": 629,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "-     -      -      -\n",
+    "html": "<hr />\n",
+    "example": 23,
+    "start_line": 632,
+    "end_line": 636,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "- - - -    \n",
+    "html": "<hr />\n",
+    "example": 24,
+    "start_line": 641,
+    "end_line": 645,
+    "section": "Thematic breaks"
   }
 ]
