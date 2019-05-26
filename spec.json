@@ -102,5 +102,21 @@
     "start_line": 650,
     "end_line": 660,
     "section": "Thematic breaks"
+  },
+  {
+    "markdown": "Foo\n***\nbar\n",
+    "html": "<p>Foo</p>\n<hr />\n<p>bar</p>\n",
+    "example": 28,
+    "start_line": 692,
+    "end_line": 700,
+    "section": "Thematic breaks"
+  },
+  {
+    "markdown": "Foo\n---\nbar\n",
+    "html": "<h2>Foo</h2>\n<p>bar</p>\n",
+    "example": 29,
+    "start_line": 709,
+    "end_line": 716,
+    "section": "Thematic breaks"
   }
 ]

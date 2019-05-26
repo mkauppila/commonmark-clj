@@ -34,8 +34,26 @@
 (defn is-h1 [line]
   (starts-with? line "# "))
 
+(defn is-h2 [line]
+  (starts-with? line "# "))
+
+(defn is-setext-h2 [line pn]
+  ;(println "is setext header")
+  (and (= line "---") (= (:type pn) :p)))
+  ;(matches-pattern line #" {0,3}-*"))
+
 (defn append-header-h1 [document line]
   (zip/append-child (root-loc document) {:type :h1 :string-value line}))
+
+(defn append-header-h2 [document line]
+  (zip/append-child (root-loc document) {:type :h2 :string-value line}))
+
+(defn append-setext-header-h2 [document line]
+  (let [pn (zip/node (prev-node document))
+        prev-p (prev-node document)]
+    (zip/replace prev-p (-> pn
+                            (assoc :type :h2)))))
+                            ;(assoc :string-value (str (:string-value pn) "\n"))))))
 
 (defn is-semantic-break [line]
   (matches-pattern line #" {0,3}(((-|\*|\_) *){3,})"))
@@ -62,14 +80,17 @@
     (zip/replace (prev-node document) (-> node (assoc :closed? true)))))
 
 (defn parse-line [document line]
-  (cond
-    (is-h1 line) (append-header-h1 document line)
-    (is-semantic-break line) (append-semantic-break document line)
-    (is-code-block line) (append-code-block document line)
-    ; new stuff here
-    (is-empty-line line) (close-previous-node document line)
-    (is-paragraph line) (append-paragraph document line)
-    :else document))
+  (let [pn (zip/node (prev-node document))]
+    (cond
+      (is-h1 line) (append-header-h1 document line)
+      (is-h2 line) (append-header-h2 document line)
+      (is-setext-h2 line pn) (append-setext-header-h2 document line)
+      (is-semantic-break line) (append-semantic-break document line)
+      (is-code-block line) (append-code-block document line)
+      ; new stuff here
+      (is-empty-line line) (close-previous-node document line)
+      (is-paragraph line) (append-paragraph document line)
+      :else document)))
 
 (defn parse
   "Parses the contents into AST."
@@ -82,6 +103,7 @@
   (cond
     (= (:type el) :p) (str acc "<p>" (:string-value el) "</p>\n")
     (= (:type el) :h1) (str acc "<h1>" (:string-value el) "</h1>")
+    (= (:type el) :h2) (str acc "<h2>" (:string-value el) "</h2>\n")
     (= (:type el) :hr) (str acc "<hr />\n")
     (= (:type el) :code) (str acc "<pre><code>" (:string-value el) "\n</code></pre>\n")
     :else acc))
