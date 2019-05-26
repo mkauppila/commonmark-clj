@@ -1,5 +1,5 @@
 (ns commonmark-clj.core)
-(require '[clojure.string :refer [split-lines starts-with? blank? trim]])
+(require '[clojure.string :refer [split-lines starts-with? blank? trim replace]])
 (require '[commonmark-clj.node :as node])
 (require '[clojure.zip :as zip])
 (require '[clojure.data.json :as json])
@@ -32,19 +32,49 @@
       (zip/append-child (root-loc document) {:type :p :string-value line :closed? false}))))
 
 (defn is-h1 [line]
-  (starts-with? line "# "))
+  (matches-pattern line #" {0,3}# +\w+ *"))
 
 (defn is-h2 [line]
-  (starts-with? line "# "))
+  (matches-pattern line #" {0,3}## +\w+ *"))
+
+(defn is-h3 [line]
+  (matches-pattern line #" {0,3}### +\w+ *"))
+
+(defn is-h4 [line]
+  (matches-pattern line #" {0,3}#### +\w+ *"))
+
+(defn is-h5 [line]
+  (matches-pattern line #" {0,3}##### +\w+ *"))
+
+(defn is-h6 [line]
+  (matches-pattern line #" {0,3}###### +\w+ *"))
 
 (defn is-setext-h2 [line pn]
   (and (= line "---") (= (:type pn) :p)))
 
 (defn append-header-h1 [document line]
-  (zip/append-child (root-loc document) {:type :h1 :string-value line}))
+  (zip/append-child
+    (root-loc document)
+    {:type :h1
+     :string-value (trim (replace line #"{0,3}#" ""))}))
 
 (defn append-header-h2 [document line]
-  (zip/append-child (root-loc document) {:type :h2 :string-value line}))
+  (zip/append-child
+    (root-loc document)
+    {:type :h2
+     :string-value (trim (replace line #"{0,3}##" ""))}))
+
+(defn append-header-h3 [document line]
+  (zip/append-child (root-loc document) {:type :h3 :string-value (trim (replace line #"{0,3}###" ""))}))
+
+(defn append-header-h4 [document line]
+  (zip/append-child (root-loc document) {:type :h4 :string-value (trim (replace line #"{0,3}####" ""))}))
+
+(defn append-header-h5 [document line]
+  (zip/append-child (root-loc document) {:type :h5 :string-value (trim (replace line #"{0,3}#####" ""))}))
+
+(defn append-header-h6 [document line]
+  (zip/append-child (root-loc document) {:type :h6 :string-value (trim (replace line #"{0,3}######" ""))}))
 
 (defn append-setext-header-h2 [document line]
   (let [pn (zip/node (prev-node document))
@@ -81,6 +111,10 @@
     (cond
       (is-h1 line) (append-header-h1 document line)
       (is-h2 line) (append-header-h2 document line)
+      (is-h3 line) (append-header-h3 document line)
+      (is-h4 line) (append-header-h4 document line)
+      (is-h5 line) (append-header-h5 document line)
+      (is-h6 line) (append-header-h6 document line)
       (is-setext-h2 line pn) (append-setext-header-h2 document line)
       (is-semantic-break line) (append-semantic-break document line)
       (is-code-block line) (append-code-block document line)
@@ -99,8 +133,12 @@
 (defn render-element [acc el]
   (cond
     (= (:type el) :p) (str acc "<p>" (:string-value el) "</p>\n")
-    (= (:type el) :h1) (str acc "<h1>" (:string-value el) "</h1>")
+    (= (:type el) :h1) (str acc "<h1>" (:string-value el) "</h1>\n")
     (= (:type el) :h2) (str acc "<h2>" (:string-value el) "</h2>\n")
+    (= (:type el) :h3) (str acc "<h3>" (:string-value el) "</h3>\n")
+    (= (:type el) :h4) (str acc "<h4>" (:string-value el) "</h4>\n")
+    (= (:type el) :h5) (str acc "<h5>" (:string-value el) "</h5>\n")
+    (= (:type el) :h6) (str acc "<h6>" (:string-value el) "</h6>\n")
     (= (:type el) :hr) (str acc "<hr />\n")
     (= (:type el) :code) (str acc "<pre><code>" (:string-value el) "\n</code></pre>\n")
     :else acc))
