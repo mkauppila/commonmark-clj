@@ -38,9 +38,7 @@
   (starts-with? line "# "))
 
 (defn is-setext-h2 [line pn]
-  ;(println "is setext header")
   (and (= line "---") (= (:type pn) :p)))
-  ;(matches-pattern line #" {0,3}-*"))
 
 (defn append-header-h1 [document line]
   (zip/append-child (root-loc document) {:type :h1 :string-value line}))
@@ -51,11 +49,10 @@
 (defn append-setext-header-h2 [document line]
   (let [pn (zip/node (prev-node document))
         prev-p (prev-node document)]
-    (zip/replace prev-p (-> pn
-                            (assoc :type :h2)))))
-                            ;(assoc :string-value (str (:string-value pn) "\n"))))))
+    (zip/replace prev-p (-> pn (assoc :type :h2)))))
 
 (defn is-semantic-break [line]
+  ; bug *-- is not a valid semantic break?
   (matches-pattern line #" {0,3}(((-|\*|\_) *){3,})"))
 
 (defn append-semantic-break [document line]
