@@ -32,22 +32,22 @@
       (zip/append-child (root-loc document) {:type :p :string-value line :closed? false}))))
 
 (defn is-h1 [line]
-  (matches-pattern line #" {0,3}# +\w+ *"))
+  (matches-pattern line #" {0,3}# +\w+ *#* *"))
 
 (defn is-h2 [line]
-  (matches-pattern line #" {0,3}## +\w+ *"))
+  (matches-pattern line #" {0,3}## +\w+ *#* *"))
 
 (defn is-h3 [line]
-  (matches-pattern line #" {0,3}### +\w+ *"))
+  (matches-pattern line #" {0,3}### +\w+ *#* *"))
 
 (defn is-h4 [line]
-  (matches-pattern line #" {0,3}#### +\w+ *"))
+  (matches-pattern line #" {0,3}#### +\w+ *#* *"))
 
 (defn is-h5 [line]
-  (matches-pattern line #" {0,3}##### +\w+ *"))
+  (matches-pattern line #" {0,3}##### +\w+ *#* *"))
 
 (defn is-h6 [line]
-  (matches-pattern line #" {0,3}###### +\w+ *"))
+  (matches-pattern line #" {0,3}###### +\w+ *#* *"))
 
 (defn is-setext-h2 [line pn]
   (and (= line "---") (= (:type pn) :p)))
@@ -56,25 +56,56 @@
   (zip/append-child
     (root-loc document)
     {:type :h1
-     :string-value (trim (replace line #"{0,3}#" ""))}))
+     :string-value (-> line
+                       (replace #"{0,3}#" "")
+                       (replace #"#*$" "")
+                       (trim))}))
 
 (defn append-header-h2 [document line]
   (zip/append-child
     (root-loc document)
     {:type :h2
-     :string-value (trim (replace line #"{0,3}##" ""))}))
+     :string-value (-> line
+                       (replace #"{0,3}##" "")
+                       (replace #"#*$" "")
+                       (trim))}))
 
 (defn append-header-h3 [document line]
-  (zip/append-child (root-loc document) {:type :h3 :string-value (trim (replace line #"{0,3}###" ""))}))
+  (zip/append-child
+    (root-loc document)
+    {:type :h3
+     :string-value (-> line
+                       (replace #"{0,3}###" "")
+                       (replace #"#*$" "")
+                       (trim))}))
+
 
 (defn append-header-h4 [document line]
-  (zip/append-child (root-loc document) {:type :h4 :string-value (trim (replace line #"{0,3}####" ""))}))
+  (zip/append-child
+    (root-loc document)
+    {:type :h4
+     :string-value (-> line
+                       (replace #"{0,3}####" "")
+                       (replace #"#*$" "")
+                       (trim))}))
 
 (defn append-header-h5 [document line]
-  (zip/append-child (root-loc document) {:type :h5 :string-value (trim (replace line #"{0,3}#####" ""))}))
+  (zip/append-child
+    (root-loc document)
+    {:type :h5
+     :string-value (-> line
+                       (replace #"{0,3}#####" "")
+                       (replace #"#*$" "")
+                       (trim))}))
 
 (defn append-header-h6 [document line]
-  (zip/append-child (root-loc document) {:type :h6 :string-value (trim (replace line #"{0,3}######" ""))}))
+  (zip/append-child
+    (root-loc document)
+    {:type :h6
+     :string-value (-> line
+                       (replace #"{0,3}######" "")
+                       (replace #"#*$" "")
+                       (trim))}))
 
 (defn append-setext-header-h2 [document line]
   (let [pn (zip/node (prev-node document))

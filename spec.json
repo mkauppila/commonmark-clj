@@ -175,5 +175,28 @@
     "end_line": 868,
     "section": "ATX headings"
   },
+  {
+    "markdown": "## foo ##\n  ###   bar    ###\n",
+    "html": "<h2>foo</h2>\n<h3>bar</h3>\n",
+    "example": 41,
+    "start_line": 873,
+    "end_line": 879,
+    "section": "ATX headings"
+  },
+  {
+    "markdown": "# foo ##################################\n##### foo ##\n",
+    "html": "<h1>foo</h1>\n<h5>foo</h5>\n",
+    "example": 42,
+    "start_line": 884,
+    "end_line": 890,
+    "section": "ATX headings"
+  },
+  {
+    "markdown": "### foo ###     \n",
+    "html": "<h3>foo</h3>\n",
+    "example": 43,
+    "start_line": 895,
+    "end_line": 899,
+    "section": "ATX headings"
   }
 ]
