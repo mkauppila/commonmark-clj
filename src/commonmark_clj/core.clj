@@ -1,5 +1,5 @@
 (ns commonmark-clj.core)
-(require '[clojure.string :refer [split-lines starts-with? blank? trim replace]])
+(require '[clojure.string :refer [split-lines starts-with? blank? trim replace replace-first]])
 (require '[commonmark-clj.node :as node])
 (require '[clojure.zip :as zip])
 (require '[clojure.data.json :as json])
@@ -38,7 +38,7 @@
   (matches-pattern line #" {0,3}## +\w+ *#* *"))
 
 (defn is-h3 [line]
-  (matches-pattern line #" {0,3}### +\w+ *#* *"))
+  (matches-pattern line #" {0,3}### +\w+.*"))
 
 (defn is-h4 [line]
   (matches-pattern line #" {0,3}#### +\w+ *#* *"))
@@ -47,18 +47,25 @@
   (matches-pattern line #" {0,3}##### +\w+ *#* *"))
 
 (defn is-h6 [line]
+  ; ends with '###<whitespace' then rip it off
   (matches-pattern line #" {0,3}###### +\w+ *#* *"))
 
 (defn is-setext-h2 [line pn]
   (and (= line "---") (= (:type pn) :p)))
+
+(defn trim-ending [line]
+  (let [end (count (re-find (re-pattern "#* *$") line))]
+    (if (> end 0)
+      (subs line 0 (- (count line) end))
+      line)))
 
 (defn append-header-h1 [document line]
   (zip/append-child
     (root-loc document)
     {:type :h1
      :string-value (-> line
-                       (replace #"{0,3}#" "")
-                       (replace #"#*$" "")
+                       (replace-first #"{0,3}#" "")
+                       (trim-ending)
                        (trim))}))
 
 (defn append-header-h2 [document line]
@@ -66,8 +73,8 @@
     (root-loc document)
     {:type :h2
      :string-value (-> line
-                       (replace #"{0,3}##" "")
-                       (replace #"#*$" "")
+                       (replace-first #"{0,3}##" "")
+                       (trim-ending)
                        (trim))}))
 
 (defn append-header-h3 [document line]
@@ -75,8 +82,8 @@
     (root-loc document)
     {:type :h3
      :string-value (-> line
-                       (replace #"{0,3}###" "")
-                       (replace #"#*$" "")
+                       (replace-first #"^{0,3}###" "")
+                       (trim-ending)
                        (trim))}))
 
 
@@ -85,8 +92,8 @@
     (root-loc document)
     {:type :h4
      :string-value (-> line
-                       (replace #"{0,3}####" "")
-                       (replace #"#*$" "")
+                       (replace-first #"{0,3}####" "")
+                       (trim-ending)
                        (trim))}))
 
 (defn append-header-h5 [document line]
@@ -94,8 +101,8 @@
     (root-loc document)
     {:type :h5
      :string-value (-> line
-                       (replace #"{0,3}#####" "")
-                       (replace #"#*$" "")
+                       (replace-first #"{0,3}#####" "")
+                       (trim-ending)
                        (trim))}))
 
 (defn append-header-h6 [document line]
@@ -103,8 +110,8 @@
     (root-loc document)
     {:type :h6
      :string-value (-> line
-                       (replace #"{0,3}######" "")
-                       (replace #"#*$" "")
+                       (replace-first #"{0,3}######" "")
+                       (trim-ending)
                        (trim))}))
 
 (defn append-setext-header-h2 [document line]

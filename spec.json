@@ -198,5 +198,13 @@
     "start_line": 895,
     "end_line": 899,
     "section": "ATX headings"
+  },
+  {
+    "markdown": "### foo ### b\n",
+    "html": "<h3>foo ### b</h3>\n",
+    "example": 44,
+    "start_line": 906,
+    "end_line": 910,
+    "section": "ATX headings"
   }
 ]
