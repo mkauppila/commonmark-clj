@@ -32,29 +32,34 @@
       (zip/append-child (root-loc document) {:type :p :string-value line :closed? false}))))
 
 (defn is-h1 [line]
-  (matches-pattern line #" {0,3}# +\w+ *#* *"))
+  (or (matches-pattern line #" {0,3}# +\w{0,}.*")
+      (matches-pattern line #" {0,3}#")))
 
 (defn is-h2 [line]
-  (matches-pattern line #" {0,3}## +\w+ *#* *"))
+  (or (matches-pattern line #" {0,3}## +\w{0,}.*")
+      (matches-pattern line #" {0,3}##")))
 
 (defn is-h3 [line]
-  (matches-pattern line #" {0,3}### +\w+.*"))
+  (or (matches-pattern line #" {0,3}### +\w{0,}.*")
+      (matches-pattern line #" {0,3}#")))
 
 (defn is-h4 [line]
-  (matches-pattern line #" {0,3}#### +\w+ *#* *"))
+  (or (matches-pattern line #" {0,3}#### +\w{0,}.*")
+      (matches-pattern line #" {0,3}#")))
 
 (defn is-h5 [line]
-  (matches-pattern line #" {0,3}##### +\w+ *#* *"))
+  (or (matches-pattern line #" {0,3}##### +\w{0,}.*")
+      (matches-pattern line #" {0,3}#")))
 
 (defn is-h6 [line]
-  ; ends with '###<whitespace' then rip it off
-  (matches-pattern line #" {0,3}###### +\w+ *#* *"))
+  (or (matches-pattern line #" {0,3}###### +\w{0,}.*")
+      (matches-pattern line #" {0,3}#")))
 
 (defn is-setext-h2 [line pn]
   (and (= line "---") (= (:type pn) :p)))
 
 (defn trim-ending [line]
-  (let [end (count (re-find (re-pattern "#* *$") line))]
+  (let [end (count (re-find (re-pattern " #* *$") line))]
     (if (> end 0)
       (subs line 0 (- (count line) end))
       line)))
