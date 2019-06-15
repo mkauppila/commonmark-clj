@@ -55,8 +55,11 @@
   (or (matches-pattern line #" {0,3}###### +\w{0,}.*")
       (matches-pattern line #" {0,3}#")))
 
+(defn is-setext-h1 [line pn]
+  (and (matches-pattern line #" {0,3}=+ *") (= (:type pn) :p)))
+
 (defn is-setext-h2 [line pn]
-  (and (= line "---") (= (:type pn) :p)))
+  (and (matches-pattern line #" {0,3}-+ *") (= (:type pn) :p)))
 
 (defn trim-ending [line]
   (let [end (count (re-find (re-pattern " #* *$") line))]
@@ -119,10 +122,17 @@
                        (trim-ending)
                        (trim))}))
 
+(defn append-setext-header-h1 [document line]
+  (let [pn (zip/node (prev-node document))
+        prev-p (prev-node document)
+        text (-> (:string-value pn) trim)]
+    (zip/replace prev-p (-> pn (assoc :type :h1 :string-value text)))))
+
 (defn append-setext-header-h2 [document line]
   (let [pn (zip/node (prev-node document))
-        prev-p (prev-node document)]
-    (zip/replace prev-p (-> pn (assoc :type :h2)))))
+        prev-p (prev-node document)
+        text (-> (:string-value pn) trim)]
+    (zip/replace prev-p (-> pn (assoc :type :h2 :string-value text)))))
 
 (defn is-semantic-break [line]
   ; bug *-- is not a valid semantic break?
@@ -158,6 +168,7 @@
       (is-h4 line) (append-header-h4 document line)
       (is-h5 line) (append-header-h5 document line)
       (is-h6 line) (append-header-h6 document line)
+      (is-setext-h1 line pn) (append-setext-header-h1 document line)
       (is-setext-h2 line pn) (append-setext-header-h2 document line)
       (is-semantic-break line) (append-semantic-break document line)
       (is-code-block line) (append-code-block document line)
