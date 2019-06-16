@@ -141,22 +141,34 @@
 (defn append-semantic-break [document line]
   (zip/append-child (root-loc document) {:type :hr :string-value line}))
 
-(defn is-code-block [line]
-  (matches-pattern line #" {4}.*"))
+(defn is-code-block [line pn]
+  (or (matches-pattern line #" {4}.*")
+      (and (matches-pattern line #" *") (= (:type pn) :code))))
 
+(defn transform-line [line]
+  (if (> (count line) 4)
+    (subs line 4)
+    ""))
+
+; rename to intended-code-block
 (defn append-code-block [document line]
-  (if (= (:type (zip/node (prev-node document))) :p)
-    (let [prev-p (prev-node document)
-          node (zip/node (prev-node document))]
+  (let [prev-p (prev-node document)
+        node (zip/node (prev-node document))]
+    (if (= (:type (zip/node (prev-node document))) :p)
+      ; FIXME if prev block is p, append to that. This should be done with a matcher, not here
       (zip/replace prev-p (-> node
-                              (assoc :string-value (str (:string-value node) "\n" (trim line))))))
-    (zip/append-child (root-loc document) {:type :code :string-value (trim line)})))
+                              (assoc :string-value (str (:string-value node) "\n" (transform-line line)))))
+      (if (= (:type (zip/node (prev-node document))) :code)
+        (zip/replace prev-p (-> node (assoc :string-value (str (:string-value node) "\n" (transform-line line)))))
+        (zip/append-child (root-loc document) {:type :code :string-value (transform-line line)})))))
 
 (defn is-empty-line [line]
   (= line ""))
 
 (defn close-previous-node [document line]
   (let [node (zip/node (prev-node document))]
+    ;(println "close " node)
+    ;(if-not (= (:type node) :code)
     (zip/replace (prev-node document) (-> node (assoc :closed? true)))))
 
 (defn parse-line [document line]
@@ -171,7 +183,7 @@
       (is-setext-h1 line pn) (append-setext-header-h1 document line)
       (is-setext-h2 line pn) (append-setext-header-h2 document line)
       (is-semantic-break line) (append-semantic-break document line)
-      (is-code-block line) (append-code-block document line)
+      (is-code-block line pn) (append-code-block document line)
       (is-empty-line line) (close-previous-node document line)
       (is-paragraph line) (append-paragraph document line)
       :else document)))

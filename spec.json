@@ -344,11 +344,19 @@
     "section": "Setext headings"
   },
   {
-    "markdown": "Foo\nbar\n\\---\nbaz\n",
-    "html": "<p>Foo\nbar\n---\nbaz</p>\n",
-    "example": 76,
-    "start_line": 1380,
-    "end_line": 1390,
-    "section": "Setext headings"
+    "markdown": "    a simple\n      indented code block\n",
+    "html": "<pre><code>a simple\n  indented code block\n</code></pre>\n",
+    "example": 77,
+    "start_line": 1408,
+    "end_line": 1415,
+    "section": "Indented code blocks"
+  },
+  {
+    "markdown": "    chunk1\n\n    chunk2\n  \n \n \n    chunk3\n",
+    "html": "<pre><code>chunk1\n\nchunk2\n\n\n\nchunk3\n</code></pre>\n",
+    "example": 81,
+    "start_line": 1472,
+    "end_line": 1489,
+    "section": "Indented code blocks"
   }
 ]
