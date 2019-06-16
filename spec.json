@@ -334,5 +334,21 @@
     "start_line": 1347,
     "end_line": 1359,
     "section": "Setext headings"
+  },
+  {
+    "markdown": "Foo\nbar\n* * *\nbaz\n",
+    "html": "<p>Foo\nbar</p>\n<hr />\n<p>baz</p>\n",
+    "example": 75,
+    "start_line": 1365,
+    "end_line": 1375,
+    "section": "Setext headings"
+  },
+  {
+    "markdown": "Foo\nbar\n\\---\nbaz\n",
+    "html": "<p>Foo\nbar\n---\nbaz</p>\n",
+    "example": 76,
+    "start_line": 1380,
+    "end_line": 1390,
+    "section": "Setext headings"
   }
 ]

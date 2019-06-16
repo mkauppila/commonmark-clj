@@ -56,10 +56,10 @@
       (matches-pattern line #" {0,3}#")))
 
 (defn is-setext-h1 [line pn]
-  (and (matches-pattern line #" {0,3}=+ *") (= (:type pn) :p)))
+  (and (matches-pattern line #" {0,3}=+ *") (= (:type pn) :p) (= (:closed?  pn) false)))
 
 (defn is-setext-h2 [line pn]
-  (and (matches-pattern line #" {0,3}-+ *") (= (:type pn) :p)))
+  (and (matches-pattern line #" {0,3}-+ *") (= (:type pn) :p) (= (:closed?  pn) false)))
 
 (defn trim-ending [line]
   (let [end (count (re-find (re-pattern " #* *$") line))]
@@ -172,7 +172,6 @@
       (is-setext-h2 line pn) (append-setext-header-h2 document line)
       (is-semantic-break line) (append-semantic-break document line)
       (is-code-block line) (append-code-block document line)
-      ; new stuff here
       (is-empty-line line) (close-previous-node document line)
       (is-paragraph line) (append-paragraph document line)
       :else document)))
